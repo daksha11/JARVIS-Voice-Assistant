@@ -8,6 +8,7 @@ import keyboard
 import os
 import subprocess as sp
 import pyautogui
+import webbrowser as web
 
 # Initialise the engine
 engine = pyttsx3.init('sapi5')
@@ -16,7 +17,7 @@ engine = pyttsx3.init('sapi5')
 engine.setProperty('volume', 2)
 voices = engine.getProperty('voices')
 engine.setProperty('voice', voices[0].id) # 0 from male, 1 for female
-engine.setProperty('rate', 230)
+engine.setProperty('rate', 200)
 
 # Configuring the Voice Assistant
 USER = config('USER')
@@ -73,7 +74,7 @@ def take_command():
         query = r.recognize_google(audio, language="en-IN")
         print(query)
 
-        if not ("stop" in query or "exit" in query or "leave" in query or "that's all for now" in query):
+        if not ("stop" in query or "exit" in query or "leave" in query or "that's all" in query):
             # Some shit will go in here
             pass
         else:
@@ -92,7 +93,6 @@ def take_command():
             exit()
     
     except Exception:
-        speak("Sorry, i couldn't understand you sir. Can you please repeat that?")
         query = "None"
 
     return query
@@ -134,8 +134,14 @@ if __name__ == "__main__":
                 speak("Closing Notepad for you sir.")
                 os.system("taskkill /f /im Notepad.exe")
 
+            # Weather Info
+
+            elif (("google" in query or "chrome" in query) and "open" in query):
+                speak("On it sir, Google Chrome coming right up.")
+                web.open("www.youtube.com")
+
             elif (query == "None"):
-                pass
+                speak("Sorry, I couldn't understand you sir. Can you please repeat that?")
 
             else:
-                speak("Sorry, i couldn't understand you sir. Can you please repeat that?")
+                speak("Sorry sir, I don't know how to do that.")
