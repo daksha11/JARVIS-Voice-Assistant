@@ -138,7 +138,7 @@ if __name__ == "__main__":
 
             elif (("google" in query or "chrome" in query) and "open" in query):
                 speak("On it sir, Google Chrome coming right up.")
-                web.open("www.youtube.com")
+                web.open("www.google.com")
 
             elif (query == "None"):
                 speak("Sorry, I couldn't understand you sir. Can you please repeat that?")
