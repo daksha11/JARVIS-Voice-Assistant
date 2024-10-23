@@ -109,6 +109,14 @@ if __name__ == "__main__":
             if "how are you" in query:
                 speak("I am absolutely fine sir. How about you?")
 
+            elif ("time" in query):
+                current_time = datetime.now().time()
+                if (current_time.hour < 12):
+                    time_str = current_time.strftime("%H %M a m")
+                else:
+                    time_str = current_time.strftime("%H %M p m")
+                speak(time_str)
+
             elif ("command prompt" in query and "open" in query):
                 speak("Yes sir, opening command prompt.")
                 os.system("start cmd")
