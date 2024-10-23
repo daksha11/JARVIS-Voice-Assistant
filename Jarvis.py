@@ -9,6 +9,8 @@ import os
 import subprocess as sp
 import pyautogui
 import webbrowser as web
+import requests
+import json
 
 # Initialise the engine
 engine = pyttsx3.init('sapi5')
@@ -22,6 +24,8 @@ engine.setProperty('rate', 200)
 # Configuring the Voice Assistant
 USER = config('USER')
 HOSTNAME = config("BOT")
+api_key = 'XXXXXXXXXXX'
+url = 'https://api.openweathermap.org/data/2.5/weather?'
 
 # Function to speak text
 def speak(text):
@@ -143,10 +147,27 @@ if __name__ == "__main__":
                 os.system("taskkill /f /im Notepad.exe")
 
             # Weather Info
+            elif ("weather" in query):
+                city = 'Hyderabad'
+                complete_url = url + "appid=" + api_key + "&q=" + city + "&units=metric"
+                respone = requests.get(complete_url)
+                x = respone.json()
+                y = x["main"]
+                z = x["weather"]
+                weather_description = z[0]["description"]
+                current_temperature = y["temp"]
+                current_humidity = y["humidity"]
+                speak("Weather Condition is {weather_description}".format(weather_description = weather_description))
+                speak("Temperature is {current_temperature} °C".format(current_temperature = current_temperature))
+                speak("Humidity is {current_humidity} %".format(current_humidity = current_humidity))
 
             elif (("google" in query or "chrome" in query) and "open" in query):
                 speak("On it sir, Google Chrome coming right up.")
                 web.open("www.google.com")
+            
+            elif (("google" in query or "chrome" in query) and "close" in query):
+                speak("On it sir, Google Chrome closing now.")
+                os.system("taskkill /im chrome.exe /f")
 
             elif (query == "None"):
                 speak("Sorry, I couldn't understand you sir. Can you please repeat that?")
