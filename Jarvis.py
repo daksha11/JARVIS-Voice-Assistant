@@ -20,15 +20,15 @@ engine = pyttsx3.init('sapi5')
 engine.setProperty('volume', 2)
 voices = engine.getProperty('voices')
 engine.setProperty('voice', voices[0].id) # 0 from male, 1 for female
-engine.setProperty('rate', 200)
+engine.setProperty('rate', 180)
 
 # Configuring the Voice Assistant
 USER = config('USER')
 HOSTNAME = config("BOT")
 weather_api_key = 'XXXXXXXX'
 url = 'https://api.openweathermap.org/data/2.5/weather?'
-openai_api_key = "XXXXXXXXXXX"
-assistant_id = "XXXXXXXXXXXX"
+openai_api_key = "XXXXXXXXXXXXX"
+assistant_id = "XXXXXXXXXXX"
 
 # Function to speak text
 def speak(text):
@@ -123,7 +123,7 @@ def take_command():
         query = r.recognize_google(audio, language="en-IN")
         print(query)
 
-        if not ("stop" in query or "exit" in query or "leave" in query or "that's all" in query):
+        if not ("stop" in query or "exit" in query or "leave" in query or "that's all" in query or "nothing Jarvis thank you" in query):
             # Some shit will go in here
             pass
         else:
@@ -193,7 +193,8 @@ if __name__ == "__main__":
 
             # Weather Info
             elif ("weather" in query):
-                city = 'Hyderabad'
+                response = get_assistant_response(query + ". What is the name of the location in this query. Answer in one word (just the name of the location)")
+                city = response
                 complete_url = url + "appid=" + weather_api_key + "&q=" + city + "&units=metric"
                 respone = requests.get(complete_url)
                 x = respone.json()
