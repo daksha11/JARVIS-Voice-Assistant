@@ -11,6 +11,7 @@ import pyautogui
 import webbrowser as web
 import requests
 import json
+from openai import OpenAI
 
 # Initialise the engine
 engine = pyttsx3.init('sapi5')
@@ -24,8 +25,10 @@ engine.setProperty('rate', 200)
 # Configuring the Voice Assistant
 USER = config('USER')
 HOSTNAME = config("BOT")
-api_key = 'XXXXXXXXXXX'
+weather_api_key = 'XXXXXXXX'
 url = 'https://api.openweathermap.org/data/2.5/weather?'
+openai_api_key = "XXXXXXXXXXX"
+assistant_id = "XXXXXXXXXXXX"
 
 # Function to speak text
 def speak(text):
@@ -63,6 +66,48 @@ def pause_listening():
 
 keyboard.add_hotkey("ctrl+alt+s", start_listening)
 keyboard.add_hotkey("ctrl+alt+p", pause_listening)
+
+def load_openAI_client_and_assistant():
+    client = OpenAI(api_key = openai_api_key)
+    my_assistant = client.beta.assistants.retrieve(assistant_id = assistant_id)
+    thread = client.beta.threads.create()
+
+    return client, my_assistant, thread
+
+client, my_assistant, assistant_thread = load_openAI_client_and_assistant()
+
+def wait_on_run(run, thread):
+    while run.status == "queued" or run.status == "in_progress":
+        run = client.beta.threads.runs.retrieve(
+            thread_id = thread.id,
+            run_id = run.id
+        )
+
+        time.sleep(0.5)
+    
+    return run
+
+def get_assistant_response(prompt):
+    message = client.beta.threads.messages.create(
+        thread_id = assistant_thread.id,
+        role = "user",
+        content = prompt
+    )
+
+    run = client.beta.threads.runs.create(
+        thread_id = assistant_thread.id,
+        assistant_id = assistant_id
+    )
+
+    run = wait_on_run(run, assistant_thread)
+
+    message = client.beta.threads.messages.list(
+        thread_id = assistant_thread.id,
+        order = "asc",
+        after = message.id
+    )
+
+    return message.data[0].content[0].text.value
 
 def take_command():
     global listening
@@ -149,7 +194,7 @@ if __name__ == "__main__":
             # Weather Info
             elif ("weather" in query):
                 city = 'Hyderabad'
-                complete_url = url + "appid=" + api_key + "&q=" + city + "&units=metric"
+                complete_url = url + "appid=" + weather_api_key + "&q=" + city + "&units=metric"
                 respone = requests.get(complete_url)
                 x = respone.json()
                 y = x["main"]
@@ -173,4 +218,5 @@ if __name__ == "__main__":
                 speak("Sorry, I couldn't understand you sir. Can you please repeat that?")
 
             else:
-                speak("Sorry sir, I don't know how to do that.")
+                response = get_assistant_response(query)
+                speak(response)
