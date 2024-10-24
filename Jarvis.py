@@ -25,10 +25,10 @@ engine.setProperty('rate', 180)
 # Configuring the Voice Assistant
 USER = config('USER')
 HOSTNAME = config("BOT")
-weather_api_key = 'XXXXXXXX'
+weather_api_key = 'XXXXXXXXXXXXXX'
 url = 'https://api.openweathermap.org/data/2.5/weather?'
-openai_api_key = "XXXXXXXXXXXXX"
-assistant_id = "XXXXXXXXXXX"
+openai_api_key = "XXXXXXXXXXXXXXXXXXXX"
+assistant_id = "XXXXXXXXXXXXXXXXXX"
 
 # Function to speak text
 def speak(text):
@@ -123,7 +123,7 @@ def take_command():
         query = r.recognize_google(audio, language="en-IN")
         print(query)
 
-        if not ("stop" in query or "exit" in query or "leave" in query or "that's all" in query or "nothing Jarvis thank you" in query):
+        if not ("stop" in query or "exit" in query or "leave" in query or "that's all" in query or "nothing Jarvis thank you" in query or query == "thank you Jarvis"):
             # Some shit will go in here
             pass
         else:
@@ -193,7 +193,11 @@ if __name__ == "__main__":
 
             # Weather Info
             elif ("weather" in query):
-                response = get_assistant_response(query + ". What is the name of the location in this query. Answer in one word (just the name of the location)")
+                response = get_assistant_response(query + ". What is the name of the location in this query. Answer in one word (just the name of the location). If none, answer with Unknown")
+                
+                if (response == 'Unknown'):
+                    city = 'Hyderabad'
+
                 city = response
                 complete_url = url + "appid=" + weather_api_key + "&q=" + city + "&units=metric"
                 respone = requests.get(complete_url)
@@ -203,6 +207,9 @@ if __name__ == "__main__":
                 weather_description = z[0]["description"]
                 current_temperature = y["temp"]
                 current_humidity = y["humidity"]
+                print("Weather Condition is {weather_description}".format(weather_description = weather_description))
+                print("Temperature is {current_temperature} °C".format(current_temperature = current_temperature))
+                print("Humidity is {current_humidity} %".format(current_humidity = current_humidity))
                 speak("Weather Condition is {weather_description}".format(weather_description = weather_description))
                 speak("Temperature is {current_temperature} °C".format(current_temperature = current_temperature))
                 speak("Humidity is {current_humidity} %".format(current_humidity = current_humidity))
@@ -215,9 +222,10 @@ if __name__ == "__main__":
                 speak("On it sir, Google Chrome closing now.")
                 os.system("taskkill /im chrome.exe /f")
 
-            elif (query == "None"):
+            elif (query == "None" or query == ""):
                 speak("Sorry, I couldn't understand you sir. Can you please repeat that?")
 
             else:
                 response = get_assistant_response(query)
+                print(response)
                 speak(response)
