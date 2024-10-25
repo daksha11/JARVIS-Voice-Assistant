@@ -13,6 +13,10 @@ import requests
 import json
 from openai import OpenAI
 
+
+
+
+
 # Initialise the engine
 engine = pyttsx3.init('sapi5')
 
@@ -25,10 +29,10 @@ engine.setProperty('rate', 180)
 # Configuring the Voice Assistant
 USER = config('USER')
 HOSTNAME = config("BOT")
-weather_api_key = 'XXXXXXXXXXXXXX'
+weather_api_key = 'XXXXXXXXXXXXXXXXXXX'
 url = 'https://api.openweathermap.org/data/2.5/weather?'
-openai_api_key = "XXXXXXXXXXXXXXXXXXXX"
-assistant_id = "XXXXXXXXXXXXXXXXXX"
+openai_api_key = "XXXXXXXXXXXXXXXXXXXXXXXXX"
+assistant_id = "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 
 # Function to speak text
 def speak(text):
@@ -161,9 +165,9 @@ if __name__ == "__main__":
             elif ("time" in query):
                 current_time = datetime.now().time()
                 if (current_time.hour < 12):
-                    time_str = current_time.strftime("%H %M a m")
+                    time_str = current_time.strftime("%I:%M %p")
                 else:
-                    time_str = current_time.strftime("%H %M p m")
+                    time_str = current_time.strftime("%I:%M %p")
                 speak(time_str)
 
             elif ("command prompt" in query and "open" in query):
@@ -176,8 +180,10 @@ if __name__ == "__main__":
 
             elif ("notepad" in query and "open" in query):
                 speak("Opening Notepad for you sir.")
-                notepad_path = r"C:\Windows\notepad.exe"
-                os.startfile(notepad_path)
+                #notepad_path = r"C:\Windows\notepad.exe"
+                #os.startfile(notepad_path)
+
+                os.system("notepad.exe newfile.txt")
 
             elif ("command prompt" in query and "close" in query):
                 speak("Yes sir, closing command prompt")
@@ -224,6 +230,17 @@ if __name__ == "__main__":
 
             elif (query == "None" or query == ""):
                 speak("Sorry, I couldn't understand you sir. Can you please repeat that?")
+
+            elif ("presentation" in query or "ppt" in query):
+                speak("Yes sir, creating the requested Powerpoint Presentation.")
+                response = get_assistant_response(query + ". What do you think the topic of the presentation is. Answer with only topic of the presentation and I dont want any '.' in my response")
+                
+                python_code = get_assistant_response("Give me the python code to create a ppt file on the topic " + response + " with a colourful template. Add the required content to the ppt make it informative and I want atleast 50 words per slide. I want only the code, dont give me comments or ```python``` or anything else. I strictly want only the code. Add a function that opens the PPT after creating it on its own.")
+                
+                with open(response + ".py", "a") as file:
+                    file.write(python_code)
+                
+                sp.run(["python", response + ".py"])
 
             else:
                 response = get_assistant_response(query)
